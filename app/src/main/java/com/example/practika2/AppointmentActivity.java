@@ -11,6 +11,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
 
 public class AppointmentActivity extends AppCompatActivity {
 
@@ -19,6 +20,7 @@ public class AppointmentActivity extends AppCompatActivity {
     TimePicker timePicker;
     Spinner serviceSpinner;
     Button btnSubmit;
+    TextView textViewInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class AppointmentActivity extends AppCompatActivity {
         timePicker = findViewById(R.id.time_picker);
         serviceSpinner = findViewById(R.id.spinner_service);
         btnSubmit = findViewById(R.id.btn_submit);
+        textViewInfo = findViewById(R.id.text_view_info);
 
         timePicker.setIs24HourView(true); // Установка 24-часового формата
 
@@ -40,6 +43,9 @@ public class AppointmentActivity extends AppCompatActivity {
                 R.array.services_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         serviceSpinner.setAdapter(adapter);
+
+        // Объяснение пользователю
+        textViewInfo.setText("Заполните форму ниже для записи на прием. Выберите услугу, дату и время.");
 
         // Обработка нажатия на кнопку "Записаться"
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -56,16 +62,8 @@ public class AppointmentActivity extends AppCompatActivity {
                 int year = datePicker.getYear();
 
                 // Получение времени
-                int hour;
-                int minute;
-
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    hour = timePicker.getHour();
-                    minute = timePicker.getMinute();
-                } else {
-                    hour = timePicker.getCurrentHour();
-                    minute = timePicker.getCurrentMinute();
-                }
+                int hour = timePicker.getHour();
+                int minute = timePicker.getMinute();
 
                 // Проверка заполненности полей
                 if (name.isEmpty() || phone.isEmpty()) {
