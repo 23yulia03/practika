@@ -22,16 +22,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Кнопка для записи на прием
-        Button btnAppointment = findViewById(R.id.btn_appointment);
-        btnAppointment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AppointmentActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // Кнопка для просмотра контактов
         Button btnContact = findViewById(R.id.btn_contact);
         btnContact.setOnClickListener(new View.OnClickListener() {
