@@ -1,6 +1,6 @@
 package com.example.practika2;
 
-import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -10,8 +10,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.widget.TextView;
 
 public class AppointmentActivity extends AppCompatActivity {
 
@@ -20,7 +20,7 @@ public class AppointmentActivity extends AppCompatActivity {
     TimePicker timePicker;
     Spinner serviceSpinner;
     Button btnSubmit;
-    TextView textViewInfo;
+    DBHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class AppointmentActivity extends AppCompatActivity {
         timePicker = findViewById(R.id.time_picker);
         serviceSpinner = findViewById(R.id.spinner_service);
         btnSubmit = findViewById(R.id.btn_submit);
-        textViewInfo = findViewById(R.id.text_view_info);
+        dbHelper = new com.example.practika2.DBHelper(this);
 
         timePicker.setIs24HourView(true); // Установка 24-часового формата
 
@@ -44,47 +44,50 @@ public class AppointmentActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         serviceSpinner.setAdapter(adapter);
 
-        // Объяснение пользователю
-        textViewInfo.setText("Заполните форму ниже для записи на прием. Выберите услугу, дату и время.");
-
         // Обработка нажатия на кнопку "Записаться"
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Получение данных
                 String name = editName.getText().toString().trim();
                 String phone = editPhone.getText().toString().trim();
                 String service = serviceSpinner.getSelectedItem().toString();
 
-                // Получение даты
                 int day = datePicker.getDayOfMonth();
-                int month = datePicker.getMonth() + 1;  // Месяцы начинаются с 0
+                int month = datePicker.getMonth() + 1;
                 int year = datePicker.getYear();
-
-                // Получение времени
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
 
-                // Проверка заполненности полей
-                if (name.isEmpty() || phone.isEmpty()) {
-                    Toast.makeText(AppointmentActivity.this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show();
+                // Проверка на пустые поля
+                if (name.isEmpty()) {
+                    editName.setError("Введите ваше имя");
+                } else if (phone.isEmpty()) {
+                    editPhone.setError("Введите номер телефона");
+                } else if (!phone.matches("\\d{10}")) {
+                    editPhone.setError("Введите корректный номер телефона");
                 } else {
-                    // Сохранение данных в SharedPreferences
-                    SharedPreferences sharedPreferences = getSharedPreferences("Appointments", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("name", name);
-                    editor.putString("phone", phone);
-                    editor.putString("service", service);
-                    editor.putString("date", day + "/" + month + "/" + year);
-                    editor.putString("time", hour + ":" + minute);
-                    editor.apply();
+                    // Подтверждение записи
+                    new AlertDialog.Builder(AppointmentActivity.this)
+                            .setTitle("Подтверждение записи")
+                            .setMessage("Вы уверены, что хотите записаться на " + service + " на дату " +
+                                    day + "/" + month + "/" + year + " в " + hour + ":" + minute + "?")
+                            .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    boolean isInserted = dbHelper.insertAppointment(name, phone, service,
+                                            day + "/" + month + "/" + year, hour + ":" + minute);
 
-                    // Вывод сообщения об успешной записи
-                    Toast.makeText(AppointmentActivity.this, "Запись успешно сохранена!", Toast.LENGTH_SHORT).show();
-
-                    // Очистка полей
-                    editName.setText("");
-                    editPhone.setText("");
+                                    if (isInserted) {
+                                        Toast.makeText(AppointmentActivity.this, "Запись успешно сохранена!", Toast.LENGTH_SHORT).show();
+                                        editName.setText("");
+                                        editPhone.setText("");
+                                    } else {
+                                        Toast.makeText(AppointmentActivity.this, "Ошибка при записи", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            })
+                            .setNegativeButton("Отмена", null)
+                            .show();
                 }
             }
         });

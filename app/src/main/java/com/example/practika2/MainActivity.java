@@ -6,6 +6,8 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.Button;
 
+import com.google.android.material.button.MaterialButton;
+
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -13,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Кнопка для просмотра услуг
-        Button btnServices = findViewById(R.id.btn_services);
+        MaterialButton btnServices = findViewById(R.id.btn_services);
         btnServices.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Кнопка для записи на прием
-        Button btnAppointment = findViewById(R.id.btn_appointment);
+        MaterialButton btnAppointment = findViewById(R.id.btn_appointment);
         btnAppointment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Кнопка для просмотра контактов
-        Button btnContact = findViewById(R.id.btn_contact);
+        MaterialButton btnContact = findViewById(R.id.btn_contact);
         btnContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
